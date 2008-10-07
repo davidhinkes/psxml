@@ -1,0 +1,7 @@
+import glob
+
+Import("env")
+
+localEnv = env.Clone()
+
+localEnv.SharedLibrary('#/lib/xmlps',glob.glob('*.cpp'))
