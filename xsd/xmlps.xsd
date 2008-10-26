@@ -13,10 +13,11 @@
             <xsd:any />
         </xsd:sequence>
     </xsd:complexType>
-    <xsd:element name="Callback" type="tns:data"/>
+    <xsd:element name="Data" type="tns:data"/>
     <xsd:element name="ID" type="xsd:integer">
     </xsd:element>
     <xsd:element name="Publish" type="tns:data"/>
     <xsd:element name="Subscribe" type="tns:subscribe"/>
-    <xsd:element name="Run" type="xsd:integer"/>
+    <xsd:element name="Retrieve" type="xsd:integer"/>
+    <xsd:element name="Exception" type="xsd:string"/>
 </xsd:schema>

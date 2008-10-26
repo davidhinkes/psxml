@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+$: << File.expand_path(File.dirname(__FILE__) + "/../lib")
+
+require 'xmlpsservlet.rb'
+
+
+# main like
+server = HTTPServer.new(:Port => 1080)
+
+server.mount("/",XMLPSServlet,nil)
+
+trap("INT"){server.shutdown}
+
+server.start
