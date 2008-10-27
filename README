@@ -1,4 +1,10 @@
-This is a small program for testing out the
-CURL API
+XMLPS
 
-Hinkes, David
+AUTHOR
+David Hinkes
+
+PURPOSE
+XMLPS is a publish-subscribe "middleware" product which
+harnesses the power of XML, XPath, and REST.
+
+

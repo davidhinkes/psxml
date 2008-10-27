@@ -13,15 +13,19 @@ class PSEngine
   end
   def subscribe(id,exps)
     @lock.synchronize {
-      
-      if not @queues.has_key? id
+      if not exps.empty?
         @queues[id]=Queue.new
+      else
+       @queues.delete id
       end
       
       # go through all of the xpath expressions
       # and delete this id
       @xpath_expressions.each_key { |key|
         @xpath_expressions[key].delete id
+        if @xpath_expressions[key].empty?
+          @xpath_exppressions.delete key
+        end
       }
       exps.each { |exp|
         if not @xpath_expressions.has_key? exp 
@@ -44,6 +48,9 @@ class PSEngine
   end
   def retrieve(id)
     ret = []
+    if not @queues.has_key? id
+      @queues[id] = Queue.new
+    end
     if not @queues[id].empty?
       while not @queues[id].empty?
         ret << @queues[id].pop 

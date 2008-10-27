@@ -6,7 +6,7 @@ require 'xmlpsservlet.rb'
 
 
 # main like
-server = HTTPServer.new(:Port => 1080)
+server = HTTPServer.new({:Port => 1080})
 
 server.mount("/",XMLPSServlet,nil)
 
