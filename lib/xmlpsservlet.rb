@@ -21,23 +21,24 @@ class XMLPSServlet < HTTPServlet::AbstractServlet
   @@ps_engine = PSEngine.new
   def initialize(server,dummy)
     super(server)
+    @server=server
   end
   def do_POST(req, resp)
     req_elm = Document.new(req.body).root
     if not req_elm.namespace.eql? XMLPS_NAMESPACE
       raise HTTPServletError.new
     end
-    id = req.peeraddr[3]+':'+req.peeraddr[1].to_s 
     case req_elm.name
       when "Publish" then 
         do_publish(req_elm)
       when "Subscribe" then 
-        @@formatter.write(do_subscribe(req_elm,id),resp.body)
+        @@formatter.write(do_subscribe(req_elm),resp.body)
       when "Retrieve" then 
-        @@formatter.write(do_retrieve(id),resp.body)
+        @@formatter.write(do_retrieve(req_elm),resp.body)
     end
   end
-  def do_retrieve(id)
+  def do_retrieve(pub_elm)
+    id = pub_elm.attributes['id']
     doc = Document.new
     root = doc.add_element 'Data'
     root.add_namespace(XMLPS_NAMESPACE)
@@ -48,10 +49,18 @@ class XMLPSServlet < HTTPServlet::AbstractServlet
     pub_elm.elements.each { |e|
       d = Document.new 
       d << e
-      @@ps_engine.publish(d) }
+      @@ps_engine.publish(d)
+    }
     return Document.new
   end
-  def do_subscribe(pub_elm,id) 
+  def do_subscribe(pub_elm)
+    id = 0
+    if pub_elm.attributes.has_key? 'id'
+      id = pub_elm.attributes['id'].to_i
+    else
+      id = @@ps_engine.next_id
+    end
+    
     exps = []
     XPath.each(pub_elm,"h:XPath",{'h'=>XMLPS_NAMESPACE}) { |e|
       nss = {}

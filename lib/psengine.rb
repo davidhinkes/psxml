@@ -10,23 +10,20 @@ class PSEngine
     @queues = Hash.new
     @xpath_expressions = Hash.new
     @lock = Mutex.new
+    @id = 0
+  end
+  def next_id
+    ret = 0
+    @lock.synchronize {
+      ret = @id
+      @id = @id+1
+    }
+    return ret
   end
   def subscribe(id,exps)
     @lock.synchronize {
-      if not exps.empty?
-        @queues[id]=Queue.new
-      else
-       @queues.delete id
-      end
-      
-      # go through all of the xpath expressions
-      # and delete this id
-      @xpath_expressions.each_key { |key|
-        @xpath_expressions[key].delete id
-        if @xpath_expressions[key].empty?
-          @xpath_exppressions.delete key
-        end
-      }
+      prune(id)
+      @queues[id]=Queue.new
       exps.each { |exp|
         if not @xpath_expressions.has_key? exp 
           @xpath_expressions[exp] = []
@@ -59,6 +56,18 @@ class PSEngine
       ret << @queues[id].pop
     end
     return ret
+  end
+  private
+  def prune(id)
+    @queues.delete id
+    # go through all of the xpath expressions
+    # and delete this id
+    @xpath_expressions.each_key { |key|
+      @xpath_expressions[key].delete id
+      if @xpath_expressions[key].empty?
+        @xpath_expressions.delete key
+      end
+    }
   end
 end
 

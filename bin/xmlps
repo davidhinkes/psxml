@@ -11,5 +11,4 @@ server = HTTPServer.new({:Port => 1080})
 server.mount("/",XMLPSServlet,nil)
 
 trap("INT"){server.shutdown}
-
 server.start

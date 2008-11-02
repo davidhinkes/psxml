@@ -10,9 +10,8 @@ headers = {'Content-Type' => 'text/xml'}
 
 subscribe_payload = '<h:Subscribe xmlns:h="http://asl.boeing.com/XMLPS-0.1"><h:XPath exp="/b:food"><h:Namespace prefix="b">http://test</h:Namespace></h:XPath></h:Subscribe>'
 
-subscribe_payload = '<h:Subscribe xmlns:h="http://asl.boeing.com/XMLPS-0.1"></h:Subscribe>'
 
-retreive_payload = '<h:Retrieve xmlns:h="http://asl.boeing.com/XMLPS-0.1"/>'
+retreive_payload = '<h:Retrieve id="id1" xmlns:h="http://asl.boeing.com/XMLPS-0.1"/>'
 
 
 http = Net::HTTP.start('localhost',1080)
@@ -20,7 +19,7 @@ http.read_timeout = 0
 res = http.post("/",subscribe_payload)
 puts res.body
 #while true
-  res = http.post("/",retreive_payload)
-  puts res.body
+#  res = http.post("/",retreive_payload)
+#  puts res.body
 #end
 
