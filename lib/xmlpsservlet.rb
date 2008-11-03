@@ -38,7 +38,7 @@ class XMLPSServlet < HTTPServlet::AbstractServlet
     end
   end
   def do_retrieve(pub_elm)
-    id = pub_elm.attributes['id']
+    id = pub_elm.attributes['id'].to_i
     doc = Document.new
     root = doc.add_element 'Data'
     root.add_namespace(XMLPS_NAMESPACE)

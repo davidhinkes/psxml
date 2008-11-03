@@ -16,4 +16,3 @@ elm=Document.new(payload).root
 http = Net::HTTP.start('localhost',1080)
 res = http.post("/",payload)
 puts res.body
-
