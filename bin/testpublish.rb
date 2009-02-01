@@ -8,7 +8,7 @@ include REXML
 #1: Simple POST
 headers = {'Content-Type' => 'text/xml'}
 
-payload = '<h:Publish xmlns:h="http://asl.boeing.com/XMLPS-0.1"><food xmlns="http://test">'+'p'*8192+'</food></h:Publish>'
+payload = '<h:Publish xmlns:h="http://asl.boeing.com/PSXML-0.1"><food xmlns="http://test">'+'p'*8192+'</food></h:Publish>'
 
 elm=Document.new(payload).root
 

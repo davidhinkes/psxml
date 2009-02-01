@@ -1,5 +1,5 @@
-#ifndef __XMLPS__H__
-#define __XMLPS__H__
+#ifndef __PSXML__H__
+#define __PSXML__H__
 
 #include <libxml++/libxml++.h>
 #include <curl/curl.h>
