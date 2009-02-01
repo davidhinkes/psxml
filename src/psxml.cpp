@@ -1,6 +1,6 @@
-#include <xmlps.h>
+#include <psxml.h>
 
-using namespace xmlps;
+using namespace psxml;
 using namespace xmlpp;
 
 Connection::Connection(const std::string & url): _id(-1) {

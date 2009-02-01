@@ -3,7 +3,7 @@
 # for
 # Acoustics IRAD
 #
-# XMLPS Servlet
+# PSXML Servlet
 
 require 'webrick'
 require 'rexml/document'
@@ -15,8 +15,8 @@ require 'xpathengine'
 include REXML
 include WEBrick
 
-class XMLPSServlet < HTTPServlet::AbstractServlet
-  XMLPS_NAMESPACE='http://asl.boeing.com/XMLPS-0.1'
+class PSXMLServlet < HTTPServlet::AbstractServlet
+  PSXML_NAMESPACE='http://asl.boeing.com/PSXML-0.1'
   @@formatter = Formatters::Default.new
   @@ps_engine = PSEngine.new
   def initialize(server,dummy)
@@ -25,7 +25,7 @@ class XMLPSServlet < HTTPServlet::AbstractServlet
   end
   def do_POST(req, resp)
     req_elm = Document.new(req.body).root
-    if not req_elm.namespace.eql? XMLPS_NAMESPACE
+    if not req_elm.namespace.eql? PSXML_NAMESPACE
       raise HTTPServletError.new
     end
     case req_elm.name
@@ -41,7 +41,7 @@ class XMLPSServlet < HTTPServlet::AbstractServlet
     id = pub_elm.attributes['id'].to_i
     doc = Document.new
     root = doc.add_element 'Data'
-    root.add_namespace(XMLPS_NAMESPACE)
+    root.add_namespace(PSXML_NAMESPACE)
     @@ps_engine.retrieve(id).each { |e|  root << e}
     return root 
   end
@@ -62,16 +62,16 @@ class XMLPSServlet < HTTPServlet::AbstractServlet
     end
     
     exps = []
-    XPath.each(pub_elm,"h:XPath",{'h'=>XMLPS_NAMESPACE}) { |e|
+    XPath.each(pub_elm,"h:XPath",{'h'=>PSXML_NAMESPACE}) { |e|
       nss = {}
-      XPath.each(e,"h:Namespace",{'h'=>XMLPS_NAMESPACE}) { |ns|
+      XPath.each(e,"h:Namespace",{'h'=>PSXML_NAMESPACE}) { |ns|
         nss[ns.attributes['prefix']]=ns.text
       }
       exps << XPathEngine.new(e.attributes['exp'],nss) }
     @@ps_engine.subscribe(id,exps)
     doc =  Document.new
     root = doc.add_element 'ID'
-    root.add_namespace(XMLPS_NAMESPACE)
+    root.add_namespace(PSXML_NAMESPACE)
     root.text = id.to_s
     return doc 
   end

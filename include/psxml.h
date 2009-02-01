@@ -5,7 +5,7 @@
 #include <curl/curl.h>
 #include <list>
 #include <string>
-namespace xmlps {
+namespace psxml {
 
   class Connection {
   public:

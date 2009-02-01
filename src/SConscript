@@ -4,4 +4,4 @@ Import("env")
 
 localEnv = env.Clone()
 
-localEnv.SharedLibrary('#/lib/xmlps',glob.glob('*.cpp'))
+localEnv.SharedLibrary('#/lib/psxml',glob.glob('*.cpp'))

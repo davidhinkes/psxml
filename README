@@ -4,7 +4,7 @@ AUTHOR
 David Hinkes
 
 PURPOSE
-XMLPS is a publish-subscribe "middleware" product which
+PSXML is a publish-subscribe "middleware" product which
 harnesses the power of XML, XPath, and REST.
 
 
