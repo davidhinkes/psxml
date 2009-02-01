@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://asl.boieng.com/XMLPS-0.1"
-            xmlns:tns="http://asl.boieng.com/XMLPS-0.1"
+            targetNamespace="http://asl.boieng.com/PSXML-0.1"
+            xmlns:tns="http://asl.boieng.com/PSXML-0.1"
             elementFormDefault="qualified">
     <xsd:complexType name="subscribe">
         <xsd:sequence maxOccurs="unbounded">
