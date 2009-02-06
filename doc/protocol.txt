@@ -19,11 +19,12 @@ The protocol is partitioned into virtual packets of the following form:
 | byte 1 | byte 2 | byte 3 | byte 4 |
 
 | psxml_identifier (4 bytes)        |
+| psxml_identifier (4 bytes)        |
 | payload_size     (4 bytes)        |
 | payload          (size bytes)     |
 |           ...                     |
 
-The total length of the message is (payload_size+8) bytes.
+The total length of the message is (payload_size+12) bytes.
 
 The packet protocol is a follows:
 psxml_identifier = constant stream of bytes identifying the psxml virtual
