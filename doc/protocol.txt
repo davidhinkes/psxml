@@ -28,8 +28,8 @@ The total length of the message is (payload_size+12) bytes.
 
 The packet protocol is a follows:
 psxml_identifier = constant stream of bytes identifying the psxml virtual
-                   packet.  Always set to "pxsml"0000 (byte string  "psxml"
-		   with four trailing 0s.
+                   packet.  Always set to "pxsml"000 (byte string  "psxml"
+		   with three trailing 0s).
 size             = unsigned 4 byte integer which represents the size of
                    the payload
 payload          = psxml payload, usually an psxml xml element of size
