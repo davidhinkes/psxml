@@ -4,4 +4,7 @@ Import("env")
 
 localEnv = env.Clone()
 
-localEnv.SharedLibrary('#/lib/psxml',glob.glob('*.cpp'))
+library_sources = glob.glob('*.cpp')
+
+localEnv.SharedLibrary('#/lib/psxml',library_sources)
+localEnv.Program('test',['test.cc']+library_sources)
