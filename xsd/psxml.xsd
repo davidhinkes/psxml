@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://asl.boieng.com/PSXML-0.1"
-            xmlns:tns="http://asl.boieng.com/PSXML-0.1"
+            targetNamespace="http://www.psxml.org/PSXML-0.1"
+            xmlns:tns="http://www.psxml.org/PSXML-0.1"
             elementFormDefault="qualified">
     <xsd:complexType name="subscribe">
         <xsd:sequence maxOccurs="unbounded">
@@ -21,10 +21,7 @@
         <xsd:attribute name="exp" type="xsd:string"/>
     </xsd:complexType>
     <xsd:element name="Data" type="tns:data"/>
-    <xsd:element name="ID" type="xsd:integer">
-    </xsd:element>
     <xsd:element name="Publish" type="tns:data"/>
     <xsd:element name="Subscribe" type="tns:subscribe"/>
-    <xsd:element name="Retrieve" type="xsd:string"></xsd:element>
     <xsd:element name="Exception" type="xsd:string"/>
 </xsd:schema>
