@@ -11,10 +11,7 @@ namespace psxml {
   public:
     Glib::ustring expression;
     xmlpp::Node::PrefixNsMap ns;
-    bool operator==(const XPathExpression & rhs) const;
-    bool operator<(const XPathExpression & rhs) const;
   private:
-    Glib::ustring _normalize() const;
   };
 
   class Connection {

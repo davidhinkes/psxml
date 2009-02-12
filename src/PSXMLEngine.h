@@ -15,13 +15,15 @@
 namespace psxml {
   class PSXMLEngine {
   public:
+    PSXMLEngine();
     void publish(xmlpp::NodeSet nodes,
       std::map<int,PSXMLProtocol* > & clients);
     void subscribe(int fd, std::list<XPathExpression> exps);
   private:
-    std::map<XPathExpression,std::list<int> > _subscriptions;
-    void _publish(const xmlpp::NodeSet & nodes,const std::list<int> & fds,
-      std::map<int,PSXMLProtocol* > & clients);
+    std::map<int,std::list<XPathExpression> > _subscriptions;
+    void _publish(const xmlpp::NodeSet & nodes,
+      PSXMLProtocol* clients);
+    const Glib::ustring _psxml_ns;
   };
 }
 
