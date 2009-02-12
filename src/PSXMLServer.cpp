@@ -17,7 +17,7 @@ PSXMLServer::PSXMLServer(uint16_t port) {
   int b = bind(_fd, reinterpret_cast<const sockaddr*>(&addr),
     sizeof(sockaddr_in));
   assert(b==0);
-  assert(listen(_fd,1024));
+  assert(listen(_fd,1024)==0);
   FD_ZERO(&_read);
   FD_ZERO(&_write);
   FD_ZERO(&_exception);
