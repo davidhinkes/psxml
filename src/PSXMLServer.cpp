@@ -129,7 +129,7 @@ void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
         Element * sub = dynamic_cast<Element*>(subs[i]);
         assert(sub != NULL);
         ustring exp(sub->get_attribute("exp")->get_value());
-        NodeSet nss = sub->find("psxml:XPath/psxml:Namespace",pnm);
+        NodeSet nss = sub->find("./psxml:Namespace",pnm);
         Node::PrefixNsMap prefix_map;
         XPathExpression xpath;
         xpath.expression = exp;
@@ -145,6 +145,6 @@ void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
       _engine.subscribe(fd,exps);
     }
     // find any data publishes
-    _engine.publish( root->find("/psxml:Data/*",pnm), _protocols);
+    _engine.publish( root->find("/psxml:Publish/*",pnm), _protocols);
   }
 }
