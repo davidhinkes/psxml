@@ -8,3 +8,5 @@ library_sources = glob.glob('*.cpp')
 
 localEnv.SharedLibrary('#/lib/psxml',library_sources)
 localEnv.Program('test',['test.cc']+library_sources)
+localEnv.Program('test-server',['test-server.cc']+library_sources)
+localEnv.Program('test-client',['test-client.cc']+library_sources)

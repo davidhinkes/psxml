@@ -22,7 +22,7 @@ namespace psxml {
     /*
      * inject PSXML message to be serialized
      */
-    void encode(boost::shared_ptr<xmlpp::Document> in);
+    void encode(xmlpp::Document * in);
     /*
      * get the number of bytes ready to be outputted from the encoder
      */

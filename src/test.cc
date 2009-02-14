@@ -30,7 +30,7 @@ int main() {
   vector<shared_ptr<Document> > es = p.decode((char*)&n_m,sizeof(n_msg));
   for(unsigned int i = 0; i < es.size(); i++) {
     assert(es[i] != NULL);
-    p.encode(es[i]);
+    p.encode(es[i].get());
     cout<<"encode bytes waiting: "<<p.pull_encoded_size()<<endl;
   }
   cout<<"Size: "<<es.size()<<endl;

@@ -5,6 +5,7 @@
 #include <cassert>
 #include <netinet/in.h>
 
+
 using namespace std;
 using namespace psxml;
 using namespace boost;
@@ -41,8 +42,7 @@ void PSXMLServer::_deal_with_sockets() {
     if(FD_ISSET(it->first,&_exception) != 0) {
       // something bad happended!
       // TODO: log
-      delete _protocols[it->first];
-      _protocols.erase(it->first);
+      _remove_fd(it->first);
     }
   }
   // 2) see if there are any awaiting new sockets on the maseter
@@ -63,8 +63,12 @@ void PSXMLServer::_deal_with_sockets() {
       // of data in one bunch
       char data[1024*64];
       ssize_t rs = recv(it->first,data,1024*64,0);
-      assert(rs > 0);
-      _route_xml(it->first,it->second->decode(data,rs));
+      assert(rs >= 0);
+      if(rs == 0) {
+        _remove_fd(it->first);
+      } else {
+        _route_xml(it->first,it->second->decode(data,rs));
+      }
     }
   }
   // 4) if there is data to be written to, do so (encode)
@@ -148,3 +152,10 @@ void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
     _engine.publish( root->find("/psxml:Publish/*",pnm), _protocols);
   }
 }
+
+void PSXMLServer::_remove_fd(int fd) {
+  delete _protocols[fd];
+  _protocols.erase(fd);
+  _update_max_fd();
+}
+

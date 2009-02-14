@@ -5,6 +5,7 @@
 #include <list>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <PSXMLProtocol.h>
 
 namespace psxml {
   class XPathExpression {
@@ -16,14 +17,17 @@ namespace psxml {
 
   class Connection {
   public:
-    Connection(const std::string & url);
+    Connection(const std::string & url,unsigned short port);
     ~Connection();
-    void publish(boost::shared_ptr<xmlpp::Document>  doc);
+    void publish(std::list<xmlpp::Element*>  doc);
     void subscribe(const std::list<XPathExpression> & xpath_expressions);
     void unsubscribe();
     std::list<boost::shared_ptr<xmlpp::Document> > run();
   private:
+    void _send_socket_io();
     xmlpp::DomParser _parser;
+    PSXMLProtocol _protocol;
+    int _fd;
   };
 
 }

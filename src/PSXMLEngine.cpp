@@ -30,10 +30,10 @@ void PSXMLEngine::subscribe(int fd, list<XPathExpression> exps) {
 void PSXMLEngine::_publish(const NodeSet & nodes, 
   PSXMLProtocol*  client) {
   for(NodeSet::const_iterator it = nodes.begin(); it!=nodes.end(); it++) {
-    shared_ptr<Document> doc(new Document);
+    Document doc;
     Element * e = NULL;
-    e = doc->create_root_node("Data",PSXMLEngine::_psxml_ns,"psxml");
+    e = doc.create_root_node("Data",PSXMLEngine::_psxml_ns,"psxml");
     e->import_node(*it);
-    client -> encode ( doc );
+    client -> encode ( &doc );
   }
 }

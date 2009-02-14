@@ -91,7 +91,7 @@ void PSXMLProtocol::pull_encoded(unsigned int bytes) {
   _encoder_residual.resize(s-bytes);
 }
 
-void PSXMLProtocol::encode(shared_ptr<Document> in) {
+void PSXMLProtocol::encode(Document * in) {
   unsigned int s = _encoder_residual.size();
   Glib::ustring out = in->write_to_string();
   _encoder_residual.resize(s+out.bytes()+sizeof(__psxml_header_t));
