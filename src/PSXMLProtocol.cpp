@@ -22,7 +22,7 @@ unsigned int PSXMLProtocol::_process_frame(const char * in,unsigned int size) {
     && string(in+offset,5)!="psxml") {
     offset++;
   }
-  if( string(in+offset,5)=="psxml" && size-offset >= 12) {
+  if(size-offset >= 12 && string(in+offset,5)=="psxml") {
     unsigned int payload_size = ntohl(
       *reinterpret_cast<const uint32_t*>(in+offset+8));
     if(size-offset-12 >= payload_size) {

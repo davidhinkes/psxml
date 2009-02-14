@@ -5,7 +5,6 @@
 #include <cassert>
 #include <netinet/in.h>
 
-
 using namespace std;
 using namespace psxml;
 using namespace boost;
@@ -35,14 +34,14 @@ void PSXMLServer::run() {
   }
 }
 void PSXMLServer::_deal_with_sockets() {
-
+  list<int> delete_list;
   // 1) check for errors
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
     if(FD_ISSET(it->first,&_exception) != 0) {
       // something bad happended!
       // TODO: log
-      _remove_fd(it->first);
+      delete_list.push_back(it->first);
     }
   }
   // 2) see if there are any awaiting new sockets on the maseter
@@ -65,7 +64,7 @@ void PSXMLServer::_deal_with_sockets() {
       ssize_t rs = recv(it->first,data,1024*64,0);
       assert(rs >= 0);
       if(rs == 0) {
-        _remove_fd(it->first);
+        delete_list.push_back(it->first);
       } else {
         _route_xml(it->first,it->second->decode(data,rs));
       }
@@ -94,7 +93,12 @@ void PSXMLServer::_deal_with_sockets() {
       it->second->pull_encoded(ss_ret);
     } // end "if we have data"
   } // end loop
-  // 5) reset the read and write fds
+  // 5) clear the delete list
+  for(list<int>::const_iterator it = delete_list.begin(); it != delete_list.end();
+    it++) {
+    _remove_fd(*it);
+  }
+  // 6) reset the read and write fds
   FD_ZERO(&_read); FD_ZERO(&_write); FD_ZERO(&_exception);
   FD_SET(_fd,&_read);
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
