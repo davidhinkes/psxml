@@ -61,7 +61,7 @@ void PSXMLServer::_deal_with_sockets() {
       // I assume that we'll never get over 64K worth
       // of data in one bunch
       char data[1024*64];
-      ssize_t rs = recv(it->first,data,1024*64,0);
+      ssize_t rs = recv(it->first,data,1024*64,MSG_DONTWAIT);
       assert(rs >= 0);
       if(rs == 0) {
         delete_list.push_back(it->first);
