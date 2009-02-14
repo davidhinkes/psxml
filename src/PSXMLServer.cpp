@@ -9,12 +9,13 @@ using namespace std;
 using namespace psxml;
 using namespace boost;
 using namespace xmlpp;
+using namespace Glib;
 
 PSXMLServer::PSXMLServer(uint16_t port) {
   _fd = socket(AF_INET, SOCK_STREAM,0);
   assert(_fd > 0);
   _max_fd=_fd;
-  sockaddr_in addr = { AF_INET, htons(port), INADDR_ANY };
+  sockaddr_in addr = { AF_INET, htons(port), {INADDR_ANY} };
   int b = bind(_fd, reinterpret_cast<const sockaddr*>(&addr),
     sizeof(sockaddr_in));
   assert(b==0);
@@ -63,7 +64,7 @@ void PSXMLServer::_deal_with_sockets() {
       char data[1024*64];
       ssize_t rs = recv(it->first,data,1024*64,0);
       assert(rs > 0);
-      _route_xml(it->second->decode(data,rs));
+      _route_xml(it->first,it->second->decode(data,rs));
     }
   }
   // 4) if there is data to be written to, do so (encode)
@@ -114,12 +115,35 @@ void PSXMLServer::_update_max_fd() {
     _update_max_fd(it->first); 
   }
 }
-
-void PSXMLServer::_route_xml(vector<shared_ptr<Document> > docs) {
+void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
   Node::PrefixNsMap pnm;
   pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
   for(unsigned int i = 0; i < docs.size(); i++) {
-    Element * root = docs[i]->get_root_node();
+    shared_ptr<Document> doc = docs[i];
+    Element * root = doc->get_root_node();
+    if(root->get_name() == "Subscribe") {
+      NodeSet subs = doc->get_root_node()->find(
+        "/psxml:Subscribe/psxml:XPath",pnm);
+      list<XPathExpression> exps;
+      for(unsigned int i =0; i < subs.size(); i++) {
+        Element * sub = dynamic_cast<Element*>(subs[i]);
+        assert(sub != NULL);
+        ustring exp(sub->get_attribute("exp")->get_value());
+        NodeSet nss = sub->find("psxml:XPath/psxml:Namespace",pnm);
+        Node::PrefixNsMap prefix_map;
+        XPathExpression xpath;
+        xpath.expression = exp;
+        for(unsigned int j = 0; j < nss.size(); j++) {
+          Element * ns = dynamic_cast<Element*>(nss[i]);
+          assert(ns != NULL);
+          ustring pf(ns->get_attribute("prefix")->get_value());
+          prefix_map[pf] = ns->get_child_text()->get_content();
+        }
+        xpath.ns = prefix_map;
+	exps.push_back(xpath);
+      }
+      _engine.subscribe(fd,exps);
+    }
     // find any data publishes
     _engine.publish( root->find("/psxml:Data/*",pnm), _protocols);
   }

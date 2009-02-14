@@ -29,7 +29,7 @@ namespace psxml {
     void _deal_with_sockets();
     void _update_max_fd(int fd);
     void _update_max_fd();
-    void _route_xml(std::vector<boost::shared_ptr<xmlpp::Document> > docs);
+    void _route_xml(int fd,std::vector<boost::shared_ptr<xmlpp::Document> > docs);
     fd_set _read,_write,_exception;
     // fs -> protocol
     std::map<int,PSXMLProtocol*> _protocols;
