@@ -7,6 +7,7 @@
 #define _PSXML_PSXMLSERVER_H_
 
 #include "PSXMLProtocol.h"
+#include "PSXMLEngine.h"
 
 #include <sys/select.h>
 #include <map>
@@ -35,6 +36,7 @@ namespace psxml {
     // fd of main server socket
     int _fd;
     int _max_fd;
+    PSXMLEngine _engine;
   };
 }
 

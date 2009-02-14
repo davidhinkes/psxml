@@ -1,4 +1,7 @@
 #include "PSXMLProtocol.h"
+#include "PSXMLEngine.h"
+#include "PSXMLServer.h"
+
 #include <iostream>
 #include <arpa/inet.h>
 #include <libxml++/libxml++.h>
@@ -31,5 +34,7 @@ int main() {
     cout<<"encode bytes waiting: "<<p.pull_encoded_size()<<endl;
   }
   cout<<"Size: "<<es.size()<<endl;
+  PSXMLServer s(10000);
+  s.run();
   return 0;
 }

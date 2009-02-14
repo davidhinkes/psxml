@@ -1,4 +1,5 @@
 #include "PSXMLServer.h"
+#include <libxml++/libxml++.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <cassert>
@@ -32,6 +33,7 @@ void PSXMLServer::run() {
   }
 }
 void PSXMLServer::_deal_with_sockets() {
+
   // 1) check for errors
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
@@ -114,4 +116,11 @@ void PSXMLServer::_update_max_fd() {
 }
 
 void PSXMLServer::_route_xml(vector<shared_ptr<Document> > docs) {
+  Node::PrefixNsMap pnm;
+  pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
+  for(unsigned int i = 0; i < docs.size(); i++) {
+    Element * root = docs[i]->get_root_node();
+    // find any data publishes
+    _engine.publish( root->find("/psxml:Data/*",pnm), _protocols);
+  }
 }
