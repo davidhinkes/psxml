@@ -35,7 +35,7 @@ void Connection::_send_socket_io() {
   unsigned int sent = 0;
   while(sent < _protocol.pull_encoded_size() ) {
     sent += send(_fd,_protocol.pull_encoded()+sent,
-      _protocol.pull_encoded_size()-sent,MSG_DONTWAIT);
+      _protocol.pull_encoded_size()-sent,0);
   }
   _protocol.pull_encoded(sent);
 }
