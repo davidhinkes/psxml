@@ -129,6 +129,7 @@ void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
   for(unsigned int i = 0; i < docs.size(); i++) {
     shared_ptr<Document> doc = docs[i];
     Element * root = doc->get_root_node();
+    // deal with subscribes
     if(root->get_name() == "Subscribe") {
       NodeSet subs = doc->get_root_node()->find(
         "/psxml:Subscribe/psxml:XPath",pnm);

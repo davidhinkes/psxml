@@ -16,6 +16,8 @@ namespace psxml {
   class PSXMLEngine {
   public:
     PSXMLEngine();
+    void publish(xmlpp::Element * elem,
+      std::map<int,PSXMLProtocol* > & clients);
     void publish(xmlpp::NodeSet nodes,
       std::map<int,PSXMLProtocol* > & clients);
     void subscribe(int fd, std::list<XPathExpression> exps);
