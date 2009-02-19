@@ -143,7 +143,7 @@ void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
         XPathExpression xpath;
         xpath.expression = exp;
         for(unsigned int j = 0; j < nss.size(); j++) {
-          Element * ns = dynamic_cast<Element*>(nss[i]);
+          Element * ns = dynamic_cast<Element*>(nss[j]);
           assert(ns != NULL);
           ustring pf(ns->get_attribute("prefix")->get_value());
           prefix_map[pf] = ns->get_child_text()->get_content();
