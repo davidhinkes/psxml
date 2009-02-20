@@ -40,6 +40,7 @@ Connection::Connection(const std::string & host,unsigned short port) {
     // if we get here, we're done!
     break;
   }
+  freeaddrinfo(info);
   if (it == NULL) {
     throw runtime_error("could not connect");
   }
