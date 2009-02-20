@@ -6,8 +6,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
+#include <netdb.h>
 
-#include <cassert>
+#include <sstream>
+#include <stdexcept>
 
 #include <sys/select.h>
 
@@ -16,14 +18,32 @@ using namespace xmlpp;
 using namespace std;
 using namespace boost;
 
-Connection::Connection(const std::string & url,unsigned short port) {
+Connection::Connection(const std::string & host,unsigned short port) {
   _pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
   _fd = socket(AF_INET, SOCK_STREAM, 0);
-  struct sockaddr_in in = {AF_INET,htons(port), {inet_addr(url.c_str())}};
-  assert(connect(_fd,reinterpret_cast<struct sockaddr*>(&in),
-    sizeof(struct sockaddr_in))==0);
+  struct addrinfo * info =  NULL;
+  struct addrinfo guess;
+  memset(&guess,0,sizeof(struct addrinfo));
+  guess.ai_family = AF_UNSPEC;
+  guess.ai_socktype = SOCK_STREAM;
+  stringstream ss;
+  ss << port;
+  getaddrinfo(host.c_str(),ss.str().c_str(),&guess,&info);
+  struct addrinfo * it = NULL;
+  for(it = info; it != NULL; it = it->ai_next) {
+    _fd = socket(it->ai_family,it->ai_socktype,it->ai_protocol);
+    if (_fd < 0)
+      continue;
+    int con = connect(_fd,it->ai_addr,it->ai_addrlen);
+    if (con < 0)
+      continue;
+    // if we get here, we're done!
+    break;
+  }
+  if (it == NULL) {
+    throw runtime_error("could not connect");
+  }
 }
-
 void Connection::publish(const list<Element*> & elems) {
   Document doc;
   Element * root = doc.create_root_node("Publish",
