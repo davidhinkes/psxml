@@ -44,7 +44,7 @@ void PSXMLServer::_deal_with_sockets() {
       delete_list.push_back(it->first);
     }
   }
-  // 2) see if there are any awaiting new sockets on the maseter
+  // 2) see if there are any awaiting new sockets on the master
   // sever socket
   if(FD_ISSET(_fd,&_read)!=0) {
     int new_fd = accept(_fd,NULL,NULL);
