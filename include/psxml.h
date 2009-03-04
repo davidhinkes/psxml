@@ -21,6 +21,13 @@ namespace psxml {
      * Create a Connection object
      */
     Connection(const std::string & url,unsigned short port);
+    /*
+     * Create a Connection object via local connection to psxml
+     */
+    Connection();
+    /*
+     * Destroy the connection
+     */
     ~Connection();
     /*
      * Publish xml data
@@ -42,6 +49,10 @@ namespace psxml {
      * block until data is received
      */
     std::list<xmlpp::Element*> run();
+    /*
+     * get the underlying FD
+     */
+    int fd() const;
   private:
     std::list<xmlpp::Element*> _run(unsigned int usecs, bool use_timer);
     void _send_socket_io();

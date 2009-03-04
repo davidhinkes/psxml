@@ -12,12 +12,19 @@
 #include <stdexcept>
 
 #include <sys/select.h>
+#include <sys/un.h>
 
 using namespace psxml;
 using namespace xmlpp;
 using namespace std;
 using namespace boost;
-
+Connection::Connection() {
+  _pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
+  _fd = socket(AF_LOCAL, SOCK_STREAM, 0);
+  sockaddr_un addr = {AF_UNIX,"/tmp/psxml"};
+  assert(connect(_fd,reinterpret_cast<sockaddr*>(&addr),
+    sizeof(sockaddr_un)) == 0);
+}
 Connection::Connection(const std::string & host,unsigned short port) {
   _pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
   _fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -137,4 +144,8 @@ list<Element*> Connection::_run(unsigned int usec, bool use_timer) {
     }
   }
   return elems;
+}
+
+int Connection::fd() const {
+  return _fd;
 }

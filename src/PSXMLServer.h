@@ -22,6 +22,10 @@ namespace psxml {
      */
     PSXMLServer(uint16_t port);
     /*
+     * kill the server
+     */
+    ~PSXMLServer();
+    /*
      * start the server, never return
      */
     void run();
@@ -36,7 +40,8 @@ namespace psxml {
     // fs -> protocol
     std::map<int,PSXMLProtocol*> _protocols;
     // fd of main server socket
-    int _fd;
+    int _external_fd;
+    int _local_fd;
     int _max_fd;
     PSXMLEngine _engine;
   };

@@ -68,7 +68,7 @@ vector<shared_ptr<Document> > PSXMLProtocol::decode(const char * in,
   // the result is now sitting in _decoder_output
 
   // 4) reset the residual for future iterations
-  memcpy(&_decoder_residual[0], start, _decoder_residual.size()-p);
+  memmove(&_decoder_residual[0], start, _decoder_residual.size()-p);
   _decoder_residual.resize(_decoder_residual.size()-p);
  
   // 5) we're done
@@ -87,7 +87,7 @@ void PSXMLProtocol::pull_encoded(unsigned int bytes) {
   // if bytes are > residual's size, something is wrong
   unsigned int s = _encoder_residual.size();
   assert(bytes <= s);
-  memcpy(&_encoder_residual[0], &_encoder_residual[0]+bytes,s-bytes);
+  memmove(&_encoder_residual[0], &_encoder_residual[0]+bytes,s-bytes);
   _encoder_residual.resize(s-bytes);
 }
 
