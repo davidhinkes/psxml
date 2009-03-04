@@ -36,6 +36,10 @@ void PSXMLEngine::subscribe(int fd, list<XPathExpression> exps) {
   _subscriptions[fd]=exps;
 }
 
+void PSXMLEngine::remove(int fd) {
+  _subscriptions.erase(fd);
+}
+
 void PSXMLEngine::_publish(const NodeSet & nodes, 
   PSXMLProtocol*  client) {
   for(NodeSet::const_iterator it = nodes.begin(); it!=nodes.end(); it++) {

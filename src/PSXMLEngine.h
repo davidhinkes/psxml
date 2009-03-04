@@ -21,6 +21,7 @@ namespace psxml {
     void publish(const xmlpp::NodeSet & nodes,
       std::map<int,PSXMLProtocol* > & clients);
     void subscribe(int fd, std::list<XPathExpression> exps);
+    void remove(int fd);
   private:
     std::map<int,std::list<XPathExpression> > _subscriptions;
     void _publish(const xmlpp::NodeSet & nodes,

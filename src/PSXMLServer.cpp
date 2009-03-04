@@ -113,8 +113,7 @@ void PSXMLServer::_deal_with_sockets() {
   } // end loop
   // clear the delete list
   for(list<int>::const_iterator it = delete_list.begin();
-    it != delete_list.end();
-    it++) {
+    it != delete_list.end(); it++) {
     _remove_fd(*it);
   }
   // reset the read and write fds
@@ -181,6 +180,7 @@ void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
 void PSXMLServer::_remove_fd(int fd) {
   delete _protocols[fd];
   _protocols.erase(fd);
+  _engine.remove(fd);
 }
 
 PSXMLServer::~PSXMLServer() {
