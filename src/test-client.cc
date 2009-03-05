@@ -15,7 +15,7 @@ int main() {
   ex.expression = "/x:testdata";
   ex.ns["x"]="http://playboy.com";
   exes.push_back(ex);
-  con.subscribe(exes);
+  exes.push_back(ex);
   con.subscribe(exes);
   list<Element *> l;
   Document d;
