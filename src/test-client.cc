@@ -16,6 +16,7 @@ int main() {
   ex.ns["x"]="http://playboy.com";
   exes.push_back(ex);
   con.subscribe(exes);
+  con.subscribe(exes);
   list<Element *> l;
   Document d;
   Element * e =d.create_root_node("testdata","http://playboy.com","la");

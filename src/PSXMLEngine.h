@@ -11,6 +11,7 @@
 #include <list>
 #include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
+#include <set>
 
 namespace psxml {
   class PSXMLEngine {
@@ -24,7 +25,7 @@ namespace psxml {
     void remove(int fd);
   private:
     std::map<int,std::list<XPathExpression> > _subscriptions;
-    void _publish(const xmlpp::NodeSet & nodes,
+    void _publish(const std::set<xmlpp::Node*> & nodes,
       PSXMLProtocol* clients);
     const Glib::ustring _psxml_ns;
   };
