@@ -20,8 +20,16 @@ void PSXMLEngine::publish(const Element * pub_elem,
       j != it->second.end(); j++) {
       // apply xpath expression and get list of ndes to publish
       NodeSet pub_list = doc.get_root_node()->find(j->expression,j->ns);
-      for(unsigned int i = 0; i < pub_list.size(); i++)
-        node_set.insert(pub_list[i]);
+      for(unsigned int i = 0; i < pub_list.size(); i++) {
+        // if this client is in full copy mode, send the ENTIRE
+	// XML message, not just the results of the XPATH
+	// else, send the normal XPATH output (which may be a subset 
+	// of the origonal XML message)
+        if(_full_copy[it->first])
+	  node_set.insert(doc.get_root_node());
+	else
+	  node_set.insert(pub_list[i]);
+      }
     }
     _publish(node_set,clients[it->first]);
   }
@@ -35,12 +43,15 @@ void PSXMLEngine::publish(const NodeSet & nodes,
   }
 }
  
-void PSXMLEngine::subscribe(int fd, list<XPathExpression> exps) {
+void PSXMLEngine::subscribe(int fd, list<XPathExpression> exps,
+  bool full_copy) {
   _subscriptions[fd]=exps;
+  _full_copy[fd] = full_copy;
 }
 
 void PSXMLEngine::remove(int fd) {
   _subscriptions.erase(fd);
+  _full_copy.erase(fd);
 }
 
 void PSXMLEngine::_publish(const set<Node*> & nodes, 
@@ -53,3 +64,20 @@ void PSXMLEngine::_publish(const set<Node*> & nodes,
     client -> encode ( &doc );
   }
 }
+
+list<XPathExpression> PSXMLEngine::aggregate_subscriptions() {
+  list<XPathExpression> exps;
+  for(map<int,list<XPathExpression> >::const_iterator it = 
+    _subscriptions.begin(); it != _subscriptions.end(); it++) {
+    // the subscriptions only count if they are local (!_full_copy)
+    bool b = _full_copy[it->first];
+    if(!b) {
+      for(list<XPathExpression>::const_iterator j = it->second.begin();
+        j != it->second.end(); j++) {
+	exps.push_back(*j);
+      }
+    }
+  }
+  return exps;
+}
+

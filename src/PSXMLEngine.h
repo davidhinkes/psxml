@@ -21,13 +21,16 @@ namespace psxml {
       std::map<int,PSXMLProtocol* > & clients);
     void publish(const xmlpp::NodeSet & nodes,
       std::map<int,PSXMLProtocol* > & clients);
-    void subscribe(int fd, std::list<XPathExpression> exps);
+    void subscribe(int fd, std::list<XPathExpression> exps,
+      bool full_copy = false);
     void remove(int fd);
+    std::list<XPathExpression> aggregate_subscriptions();
   private:
     std::map<int,std::list<XPathExpression> > _subscriptions;
     void _publish(const std::set<xmlpp::Node*> & nodes,
       PSXMLProtocol* clients);
     const Glib::ustring _psxml_ns;
+    std::map<int,bool> _full_copy;
   };
 }
 
