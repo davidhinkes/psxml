@@ -5,6 +5,7 @@
 #include <cassert>
 #include <netinet/in.h>
 #include <sys/un.h>
+#include <cerrno>
 
 using namespace std;
 using namespace psxml;
@@ -80,8 +81,7 @@ void PSXMLServer::_deal_with_sockets() {
       // of data in one bunch
       char data[1024*64];
       ssize_t rs = recv(it->first,data,1024*64,MSG_DONTWAIT);
-      assert(rs >= 0);
-      if(rs == 0) {
+      if(rs <= 0) {
         delete_list.push_back(it->first);
       } else {
         _route_xml(it->first,it->second->decode(data,rs));
@@ -96,19 +96,26 @@ void PSXMLServer::_deal_with_sockets() {
       && it->second->pull_encoded_size() > 0) {
       // we have data to send (of some sort)
       ssize_t ss = it->second->pull_encoded_size();
-      ssize_t ss_ret = send(it->first,it->second->pull_encoded(),
-        ss,MSG_DONTWAIT);
+      ssize_t ss_ret = -1;
       // if there is too much data, throttle back
-      while(ss_ret < 0) {
-        // reduce the amount we attempt to send by half
-        ss /= 2;
-	assert (ss != 0);
+      bool too_much_data = false;
+      
+      do {
         ss_ret = send(it->first,it->second->pull_encoded(),
-          ss,MSG_DONTWAIT);
+	  ss, MSG_DONTWAIT);
+        // reduce the amount we attempt to send by half 
+        too_much_data = (errno == EAGAIN || errno == EWOULDBLOCK);
+	ss /= 2;
+	assert (ss != 0);
+      } while (ss_ret <0 && too_much_data);
+      if(ss_ret >= 0) {
+        // tell the PSXML protocol manager that we did send
+        // ss_ret bytes out
+        it->second->pull_encoded(ss_ret);
+      } else {
+        // something bad happend!
+        delete_list.push_back(it->first);
       }
-      // tell the PSXML protocol manager that we did send
-      // ss_ret bytes out
-      it->second->pull_encoded(ss_ret);
     } // end "if we have data"
   } // end loop
   // clear the delete list
