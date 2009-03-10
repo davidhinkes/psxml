@@ -31,10 +31,13 @@ int main() {
   con.publish(l);
   con.publish(l);
   while(true) {
-  list<Element *> elems = con.run();
+  list<Element *> elems = con.run(10*1000000);
   for(list<Element*>::const_iterator it = elems.begin();
     it != elems.end(); it++) {
     cout<<(*it)->get_name()<<endl;
+  }
+  if(elems.size() == 0) {
+    con.publish(l);
   }
   }
   return 0;
