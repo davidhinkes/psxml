@@ -38,11 +38,12 @@ namespace psxml {
      * tell the encoder how may bytes were successfully removed
      */
     void pull_encoded(unsigned int bytes);
+
   private:
-    unsigned int _process_frame(const char * in, unsigned int size);
+    unsigned int _process_frame(const char * in, unsigned int size,
+      std::vector<boost::shared_ptr<xmlpp::Document> > & docs);
     std::vector<char> _decoder_residual;
     std::vector<char> _encoder_residual;
-    std::vector<boost::shared_ptr<xmlpp::Document> > _decoder_output;
     xmlpp::DomParser _parser;
   };
 }

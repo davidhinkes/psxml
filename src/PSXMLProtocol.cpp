@@ -14,7 +14,8 @@ struct __psxml_header_t {
   uint32_t size;
 };
 
-unsigned int PSXMLProtocol::_process_frame(const char * in,unsigned int size) {
+unsigned int PSXMLProtocol::_process_frame(const char * in,unsigned int size,
+  vector<shared_ptr<Document> > & docs) {
   unsigned int read = 0;
   unsigned int offset = 0;
   // calculate any offset
@@ -34,7 +35,7 @@ unsigned int PSXMLProtocol::_process_frame(const char * in,unsigned int size) {
         shared_ptr<Document> doc(new Document());
         doc->create_root_node_by_import(
 	  _parser.get_document()->get_root_node());
-        _decoder_output.push_back(doc);
+        docs.push_back(doc);
         // we just processed a whole bunch of bytes
         read = offset+12+payload_size;
       } else {
@@ -46,33 +47,30 @@ unsigned int PSXMLProtocol::_process_frame(const char * in,unsigned int size) {
 
 vector<shared_ptr<Document> > PSXMLProtocol::decode(const char * in,
   unsigned int size) {
+  vector<shared_ptr<Document> > docs;
   // 1) Append start buffer to the end of the decder vector
   // make the vector big enough to handle the data
   unsigned int vector_size = _decoder_residual.size();
   _decoder_residual.resize(vector_size+size);
   //append
   memcpy(&_decoder_residual[0] + vector_size,in,size);
-  // 3) clear the _decoder_output
-  _decoder_output.clear();
-  // 4) call _process_frame
+  // 2) call _process_frame
   const char * start = &_decoder_residual[0];
   unsigned int s = _decoder_residual.size();
   unsigned int p=0;
   unsigned int r = 0;
   do {
-    r = _process_frame(start,s);
+    r = _process_frame(start,s,docs);
     s-=r;
     start+=r;
     p+=r;
   } while(r!=0);
-  // the result is now sitting in _decoder_output
 
-  // 4) reset the residual for future iterations
+  // 3) reset the residual for future iterations
   memmove(&_decoder_residual[0], start, _decoder_residual.size()-p);
   _decoder_residual.resize(_decoder_residual.size()-p);
- 
-  // 5) we're done
-  return _decoder_output;
+  // 4) we're done
+  return docs;
 }
 
 unsigned int PSXMLProtocol::pull_encoded_size() const {
