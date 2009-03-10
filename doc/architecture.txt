@@ -1,0 +1,13 @@
+PSXML ARCHITECTURE
+
+by David Hinkes
+
+OVERVIEW
+This document outlines the software architecture implemented by the PSXML
+framework.
+
+PSXML is a network based middleware product which harnesses the power of XML
+and XPath.  PSXML implements the observer pattern to route messages over
+multiple computers.  The messages are user defined in XML form, and can be
+subscribed to via XPath.  The PSXML framework is responsible for routing such
+messages from producer to consumer via a hub-and-spoke topology.
