@@ -133,6 +133,9 @@ list<Element*> Connection::_run(unsigned int usec, bool use_timer) {
     if(FD_ISSET(_fd,&read)) {
       char buf[1024*64];
       ssize_t bytes_read = recv(_fd,buf,1024*64,0);
+      if (bytes_read <=0 )
+        throw runtime_error("server disconnect");
+      // TODO: deal with read=0 case
       vector<shared_ptr<Document> > ds = _protocol.decode(buf,bytes_read);
       for(unsigned int i = 0; i < ds.size(); i++) {
         _docs.push_back(ds[i]);
