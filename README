@@ -7,4 +7,21 @@ PURPOSE
 PSXML is a publish-subscribe "middleware" product which
 harnesses the power of XML & XPath.
 
+MOTIVATION
+There are many data distribution products ("middleware") available, however PSXML addresses several problems with existing solutions:
+* There exists a plethora of RPC based packages, however few offer a native and intuitive-to-use publish/subscribe (observer pattern) capability.
+* Most Publish/Subscribe "middlware" products deal poorly with the client data being distributed.  Most products fall into one of the following two categories.
+  - Blindly passes around binary blobs and has no understanding of the message payloads.  This often creates more error-prone work for clients as they are required to serialize thier objects manually.  This category includes MTM, JMS, et al.
+  - Makes use of a propreitary message specification format (meta-language), such as IDL.  This works well, but usaly requires auto-generated code.  Examples include NDDS, CORBA, ICE, et al.
+* Inability to subscribe based on the contents of the client data.  Most solutions make use of a "Topic" paradigm in order to discriminate between different virtual channels of data.
+* Several solutions are also tied to a specific software language.  Some examples include DRB and JMS.
 
+PSXML takes a novel approach to implement a pub/sub software framework:
+* Designed from the bottom up to provide pub/sub functionality - nothing more
+* Intuitive software API
+* Use of XML for client message payloads
+* Client subscriptions via XPath expressions, acting as filters on the message contents
+* Support for multiple software languages
+* Open source software
+
+Given the above, only one "middleware" product provides similar functionality: xmlblaster (http://xmlblaster.org).
