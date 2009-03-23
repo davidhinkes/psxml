@@ -30,6 +30,14 @@ PSXMLServer::PSXMLServer(uint16_t port) {
   assert(bind(_local_fd, reinterpret_cast<const sockaddr*>(&un), 
     sizeof(sockaddr_un)) == 0);
   assert(listen(_local_fd,1024)==0);
+
+  //setup the discovery socket
+  _discovery_fd = socket(AF_INET,SOCK_DGRAM,0);
+  // reuse addr
+  b = bind(_discovery_fd, reinterpret_cast<const sockaddr*>(&addr),
+    sizeof(sockaddr_in));
+  assert(b==0);
+
   // clear the FD lists 
   FD_ZERO(&_read);
   FD_ZERO(&_write);
@@ -70,8 +78,20 @@ void PSXMLServer::_deal_with_sockets() {
     assert(new_fd > 0);
     _protocols[new_fd] = new PSXMLProtocol;
   }
-
-
+  // see if there are any awating new messages on the discovery
+  // UDP socket
+  if(FD_ISSET(_discovery_fd,&_read)!=0) {
+    sockaddr_in addr;
+    size_t addr_size;
+    char packet[6];
+    packet[5] = 0;
+    recvfrom(_discovery_fd,packet,5,0,reinterpret_cast<sockaddr*>(&addr),
+      &addr_size);
+    if(string(packet) =="psxml") {
+      // got a discovery packet
+    }
+  }
+ 
   // if there is data to be read, read and process (decode)
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
@@ -126,6 +146,7 @@ void PSXMLServer::_deal_with_sockets() {
   // reset the read and write fds
   FD_ZERO(&_read); FD_ZERO(&_write); FD_ZERO(&_exception);
   FD_SET(_external_fd,&_read);
+  FD_SET(_discovery_fd,&_read);
   FD_SET(_local_fd,&_read);
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
@@ -144,6 +165,7 @@ void PSXMLServer::_update_max_fd(int fd) {
 
 void PSXMLServer::_update_max_fd() {
   _max_fd = max(_local_fd,_external_fd);
+  _max_fd = max(_max_fd,_discovery_fd);
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
     _update_max_fd(it->first); 

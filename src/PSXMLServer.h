@@ -42,6 +42,7 @@ namespace psxml {
     // fd of main server socket
     int _external_fd;
     int _local_fd;
+    int _discovery_fd;
     int _max_fd;
     PSXMLEngine _engine;
   };

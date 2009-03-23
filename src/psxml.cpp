@@ -25,6 +25,12 @@ Connection::Connection() {
   assert(connect(_fd,reinterpret_cast<sockaddr*>(&addr),
     sizeof(sockaddr_un)) == 0);
 }
+Connection::Connection(sockaddr_in addr) {
+  _pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
+  _fd = socket(AF_LOCAL, SOCK_STREAM, 0);
+  assert(connect(_fd,reinterpret_cast<sockaddr*>(&addr),
+    sizeof(sockaddr_in)) == 0);
+}
 Connection::Connection(const std::string & host,unsigned short port) {
   _pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
   _fd = socket(AF_INET, SOCK_STREAM, 0);

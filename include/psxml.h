@@ -6,6 +6,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <PSXMLProtocol.h>
+#include <netinet/in.h>
 
 namespace psxml {
   class XPathExpression {
@@ -22,6 +23,10 @@ namespace psxml {
      */
     Connection(const std::string & url,unsigned short port);
     /*
+     * Create a Connection object
+     */
+    Connection(sockaddr_in addr);
+   /*
      * Create a Connection object via local connection to psxml
      */
     Connection();
