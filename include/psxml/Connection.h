@@ -1,5 +1,5 @@
-#ifndef __PSXML__H__
-#define __PSXML__H__
+#ifndef __PSXML_CONNECTION__H__
+#define __PSXML_CONNECTION__H__
 
 #include <libxml++/libxml++.h>
 #include <list>

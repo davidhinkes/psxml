@@ -4,3 +4,4 @@
 *.so
 src/test
 src/test-*
+bin
