@@ -219,6 +219,7 @@ PSXMLServer::~PSXMLServer() {
   }
   close(_external_fd);
   close(_local_fd);
+  close(_discovery_fd);
 
   remove("/tmp/psxml");
 }
