@@ -5,17 +5,12 @@
 #include <list>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include <PSXMLProtocol.h>
+#include <psxml/PSXMLProtocol.h>
 #include <netinet/in.h>
+#include <psxml/PSXMLXPathExpression.h>
 
 namespace psxml {
-  class XPathExpression {
-  public:
-    Glib::ustring expression;
-    xmlpp::Node::PrefixNsMap ns;
-  private:
-  };
-
+  
   class Connection {
   public:
     /*

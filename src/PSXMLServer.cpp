@@ -82,7 +82,7 @@ void PSXMLServer::_deal_with_sockets() {
   // UDP socket
   if(FD_ISSET(_discovery_fd,&_read)!=0) {
     sockaddr_in addr;
-    size_t addr_size;
+    socklen_t addr_size;
     char packet[6];
     packet[5] = 0;
     recvfrom(_discovery_fd,packet,5,0,reinterpret_cast<sockaddr*>(&addr),
