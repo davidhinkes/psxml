@@ -8,6 +8,7 @@
 #include <cassert>
 
 #include <csignal>
+#include <unistd.h>
 
 using namespace std;
 using namespace psxml;
@@ -23,6 +24,11 @@ void die(int) {
 }
 int main() {
   server = new PSXMLServer(10000);
+  // return to the terminal ...
+  int id = fork();
+  if(id != 0)
+    return 0;
+ 
   signal(SIGINT,die);
   signal(SIGTERM,die);
   signal(SIGQUIT,die);
