@@ -9,6 +9,7 @@
 #include <vector>
 #include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
+#include <psxml/PSXMLXPathExpression.h>
 
 namespace psxml {
   class PSXMLProtocol {
@@ -39,6 +40,22 @@ namespace psxml {
      */
     void pull_encoded(unsigned int bytes);
 
+       /*
+     * Publish xml data
+     */
+    void publish(const std::list<xmlpp::Element*> & elems);
+    /*
+     * Subscribe via xpath
+     */
+    void subscribe(const std::list<XPathExpression> & xpath_expressions);
+    /*
+     * relinquish all subscriptions 
+     */
+    void unsubscribe();
+    /*
+     * block until data is received or usecs have passed
+     */
+ 
   private:
     unsigned int _process_frame(const char * in, unsigned int size,
       std::vector<boost::shared_ptr<xmlpp::Document> > & docs);

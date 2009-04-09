@@ -59,14 +59,7 @@ Connection::Connection(const std::string & host,unsigned short port) {
   }
 }
 void Connection::publish(const list<Element*> & elems) {
-  Document doc;
-  Element * root = doc.create_root_node("Publish",
-    "http://www.psxml.org/PSXML-0.1","psx");
-  for(list<Element*>::const_iterator it = elems.begin(); it!=elems.end();
-    it++ ) {
-    root->import_node(*it);
-  }
-  _protocol.encode(&doc);
+  _protocol.publish(elems);
   _send_socket_io();
 }
 void Connection::_send_socket_io() {
@@ -78,26 +71,12 @@ void Connection::_send_socket_io() {
   _protocol.pull_encoded(sent);
 }
 void Connection::subscribe(const list<XPathExpression> & xpaths) {
-  Document doc;
-  Element * root = doc.create_root_node("Subscribe",
-    "http://www.psxml.org/PSXML-0.1","psx");
-  for(list<XPathExpression>::const_iterator it = xpaths.begin();
-    it != xpaths.end(); it++) {
-    Element * xpath_elem = root->add_child("XPath","psx");
-    xpath_elem->set_attribute("exp",it->expression);
-    for(Node::PrefixNsMap::const_iterator pns = it->ns.begin();
-      pns != it->ns.end(); pns++) {
-      Element * ns_elem = xpath_elem->add_child("Namespace","psx");
-      ns_elem->set_attribute("prefix",pns->first);
-      ns_elem->add_child_text(pns->second);
-    }
-  }
-  _protocol.encode(&doc);
+  _protocol.subscribe(xpaths);
   _send_socket_io();
 }
 void Connection::unsubscribe() {
-  list<XPathExpression> blank;
-  subscribe(blank);
+  _protocol.unsubscribe();
+  _send_socket_io();
 } 
 Connection::~Connection() {
   // unsubscribe

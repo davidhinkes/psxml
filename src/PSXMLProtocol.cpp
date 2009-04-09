@@ -98,3 +98,36 @@ void PSXMLProtocol::encode(Document * in) {
   memcpy(&_encoder_residual[0]+s+sizeof(__psxml_header_t),
     out.data(),out.bytes());
 }
+
+void PSXMLProtocol::publish(const list<Element*> & elems) {
+  Document doc;
+  Element * root = doc.create_root_node("Publish",
+    "http://www.psxml.org/PSXML-0.1","psx");
+  for(list<Element*>::const_iterator it = elems.begin(); it!=elems.end();
+    it++ ) {
+    root->import_node(*it);
+  }
+  encode(&doc);
+}
+
+void PSXMLProtocol::subscribe(const list<XPathExpression> & xpaths) {
+  Document doc;
+  Element * root = doc.create_root_node("Subscribe",
+    "http://www.psxml.org/PSXML-0.1","psx");
+  for(list<XPathExpression>::const_iterator it = xpaths.begin();
+    it != xpaths.end(); it++) {
+    Element * xpath_elem = root->add_child("XPath","psx");
+    xpath_elem->set_attribute("exp",it->expression);
+    for(Node::PrefixNsMap::const_iterator pns = it->ns.begin();
+      pns != it->ns.end(); pns++) {
+      Element * ns_elem = xpath_elem->add_child("Namespace","psx");
+      ns_elem->set_attribute("prefix",pns->first);
+      ns_elem->add_child_text(pns->second);
+    }
+  }
+  encode(&doc);
+}
+void PSXMLProtocol::unsubscribe() {
+  list<XPathExpression> blank;
+  subscribe(blank);
+} 

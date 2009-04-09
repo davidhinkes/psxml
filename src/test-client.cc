@@ -27,11 +27,8 @@ int main() {
   buf[size-1]=0;
   e->add_child_text(buf);
   l.push_back(e);
-  con.publish(l);
-  con.publish(l);
-  con.publish(l);
   while(true) {
-  list<Element *> elems = con.run(10*1000000);
+  list<Element *> elems = con.run(1*1000000);
   for(list<Element*>::const_iterator it = elems.begin();
     it != elems.end(); it++) {
     cout<<(*it)->get_name()<<endl;
