@@ -18,13 +18,13 @@ void PSXMLEngine::publish(const Element * pub_elem,
     set<Node*> node_set;
     for(list<XPathExpression>::const_iterator j = it->second.begin();
       j != it->second.end(); j++) {
-      // apply xpath expression and get list of ndes to publish
+      // apply xpath expression and get list of nodes to publish
       NodeSet pub_list = doc.get_root_node()->find(j->expression,j->ns);
       for(unsigned int i = 0; i < pub_list.size(); i++) {
         // if this client is in full copy mode, send the ENTIRE
 	// XML message, not just the results of the XPATH
 	// else, send the normal XPATH output (which may be a subset 
-	// of the origonal XML message)
+	// of the original XML message)
         if(_full_copy[it->first])
 	  node_set.insert(doc.get_root_node());
 	else

@@ -148,10 +148,14 @@ void PSXMLServer::_deal_with_sockets() {
   FD_SET(_external_fd,&_read);
   FD_SET(_discovery_fd,&_read);
   FD_SET(_local_fd,&_read);
+  // set op the FD SET list for another round of processing
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
+    // want to know if there are reads or exceptions
     FD_SET(it->first,&_read);
     FD_SET(it->first,&_exception);
+    // want to know if data can be written only if
+    // there is data to write
     if(it->second->pull_encoded_size() > 0)
       FD_SET(it->first,&_write);
   }
