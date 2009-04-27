@@ -2,6 +2,7 @@
 
 #include <arpa/inet.h>
 #include <cassert>
+#include <cstring>
 
 using namespace std;
 using namespace psxml;
