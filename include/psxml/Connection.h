@@ -7,7 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <psxml/PSXMLProtocol.h>
 #include <netinet/in.h>
-#include <psxml/PSXMLXPathExpression.h>
+#include <psxml/XPathExpression.h>
 
 namespace psxml {
   

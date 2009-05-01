@@ -1,14 +1,14 @@
-#include "PSXMLEngine.h"
+#include "PSEngine.h"
 
 using namespace xmlpp;
 using namespace psxml;
 using namespace std;
 using namespace boost;
 
-PSXMLEngine::PSXMLEngine(): _psxml_ns("http://www.psxml.org/PSXML-0.1") {
+PSEngine::PSEngine(): _psxml_ns("http://www.psxml.org/PSXML-0.1") {
 }
 
-void PSXMLEngine::publish(const Element * pub_elem,
+void PSEngine::publish(const Element * pub_elem,
   map<int,PSXMLProtocol* > & clients) {
   // create a document with just the pub_elem
   Document doc;
@@ -35,7 +35,7 @@ void PSXMLEngine::publish(const Element * pub_elem,
   }
 }
 
-void PSXMLEngine::publish(const NodeSet & nodes,
+void PSEngine::publish(const NodeSet & nodes,
   map<int,PSXMLProtocol* > & clients) {
   // go through the list of elements and publish
   for(unsigned int i = 0; i < nodes.size(); i++) {
@@ -43,29 +43,29 @@ void PSXMLEngine::publish(const NodeSet & nodes,
   }
 }
  
-void PSXMLEngine::subscribe(int fd, list<XPathExpression> exps,
+void PSEngine::subscribe(int fd, list<XPathExpression> exps,
   bool full_copy) {
   _subscriptions[fd]=exps;
   _full_copy[fd] = full_copy;
 }
 
-void PSXMLEngine::remove(int fd) {
+void PSEngine::remove(int fd) {
   _subscriptions.erase(fd);
   _full_copy.erase(fd);
 }
 
-void PSXMLEngine::_publish(const set<Node*> & nodes, 
+void PSEngine::_publish(const set<Node*> & nodes, 
   PSXMLProtocol*  client) {
   for(set<Node*>::const_iterator it = nodes.begin(); it!=nodes.end(); it++) {
     Document doc;
     Element * e = NULL;
-    e = doc.create_root_node("Data",PSXMLEngine::_psxml_ns,"psxml");
+    e = doc.create_root_node("Data",PSEngine::_psxml_ns,"psxml");
     e->import_node(*it);
     client -> encode ( &doc );
   }
 }
 
-list<XPathExpression> PSXMLEngine::aggregate_subscriptions() {
+list<XPathExpression> PSEngine::aggregate_subscriptions() {
   list<XPathExpression> exps;
   for(map<int,list<XPathExpression> >::const_iterator it = 
     _subscriptions.begin(); it != _subscriptions.end(); it++) {

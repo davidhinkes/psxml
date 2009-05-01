@@ -3,11 +3,11 @@
  * Class which provides PSXML server logic
  */
 
-#ifndef _PSXML_PSXMLSERVER_H_
-#define _PSXML_PSXMLSERVER_H_
+#ifndef _PSXML_SERVER_H_
+#define _PSXML_SERVER_H_
 
 #include "PSXMLProtocol.h"
-#include "PSXMLEngine.h"
+#include "PSEngine.h"
 
 #include <sys/select.h>
 #include <map>
@@ -15,16 +15,16 @@
 #include <boost/shared_ptr.hpp>
 
 namespace psxml {
-  class PSXMLServer {
+  class Server {
   public:
     /*
      * initialize the server based on a port number
      */
-    PSXMLServer(uint16_t port);
+    Server(uint16_t port);
     /*
      * kill the server
      */
-    ~PSXMLServer();
+    ~Server();
     /*
      * start the server, never return
      */
@@ -44,7 +44,7 @@ namespace psxml {
     int _local_fd;
     int _discovery_fd;
     int _max_fd;
-    PSXMLEngine _engine;
+    PSEngine _engine;
   };
 }
 

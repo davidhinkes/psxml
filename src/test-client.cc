@@ -20,7 +20,7 @@ int main() {
   list<Element *> l;
   Document d;
   Element * e =d.create_root_node("testdata","http://playboy.com","la");
-  unsigned int size = 1024*1024*5;
+  unsigned int size = 1024;
   char buf[size];
   for(unsigned int i=0;i<size;i++)
     buf[i]=10;

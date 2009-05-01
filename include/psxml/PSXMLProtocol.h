@@ -9,7 +9,7 @@
 #include <vector>
 #include <libxml++/libxml++.h>
 #include <boost/shared_ptr.hpp>
-#include <psxml/PSXMLXPathExpression.h>
+#include <psxml/XPathExpression.h>
 
 namespace psxml {
   class PSXMLProtocol {

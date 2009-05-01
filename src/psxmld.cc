@@ -1,6 +1,6 @@
 #include "PSXMLProtocol.h"
-#include "PSXMLEngine.h"
-#include "PSXMLServer.h"
+#include "PSEngine.h"
+#include "Server.h"
 
 #include <iostream>
 #include <arpa/inet.h>
@@ -17,13 +17,13 @@ using namespace boost;
 
 //global variable (ooooo, ahhh, scary)
 
-static PSXMLServer * server = NULL;
+static Server * server = NULL;
 void die(int) {
   delete server;
   exit(0);
 }
 int main() {
-  server = new PSXMLServer(10000);
+  server = new Server(10000);
   // return to the terminal ...
   int id = fork();
   if(id != 0)

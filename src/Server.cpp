@@ -1,4 +1,4 @@
-#include "PSXMLServer.h"
+#include "Server.h"
 #include <libxml++/libxml++.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -13,7 +13,7 @@ using namespace boost;
 using namespace xmlpp;
 using namespace Glib;
 
-PSXMLServer::PSXMLServer(uint16_t port) {
+Server::Server(uint16_t port) {
   //setup the external socket
   _external_fd = socket(AF_INET, SOCK_STREAM,0);
   assert(_external_fd > 0);
@@ -43,7 +43,7 @@ PSXMLServer::PSXMLServer(uint16_t port) {
   FD_ZERO(&_write);
   FD_ZERO(&_exception);
 }
-void PSXMLServer::run() {
+void Server::run() {
   int ret=0;
   while(true) {
     _deal_with_sockets();
@@ -53,7 +53,7 @@ void PSXMLServer::run() {
     assert(ret >=0);
   }
 }
-void PSXMLServer::_deal_with_sockets() {
+void Server::_deal_with_sockets() {
   list<int> delete_list;
   // check for errors
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
@@ -162,12 +162,12 @@ void PSXMLServer::_deal_with_sockets() {
 
 } /* end function */
 
-void PSXMLServer::_update_max_fd(int fd) {
+void Server::_update_max_fd(int fd) {
   if (fd > _max_fd)
     _max_fd = fd;
 }
 
-void PSXMLServer::_update_max_fd() {
+void Server::_update_max_fd() {
   _max_fd = max(_local_fd,_external_fd);
   _max_fd = max(_max_fd,_discovery_fd);
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
@@ -175,7 +175,7 @@ void PSXMLServer::_update_max_fd() {
     _update_max_fd(it->first); 
   }
 }
-void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
+void Server::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
   Node::PrefixNsMap pnm;
   pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
   for(unsigned int i = 0; i < docs.size(); i++) {
@@ -210,13 +210,13 @@ void PSXMLServer::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
   }
 }
 
-void PSXMLServer::_remove_fd(int fd) {
+void Server::_remove_fd(int fd) {
   delete _protocols[fd];
   _protocols.erase(fd);
   _engine.remove(fd);
 }
 
-PSXMLServer::~PSXMLServer() {
+Server::~Server() {
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
     close(it->first);
