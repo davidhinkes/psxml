@@ -17,6 +17,9 @@ Server::Server(uint16_t port) {
   //setup the external socket
   _external_fd = socket(AF_INET, SOCK_STREAM,0);
   assert(_external_fd > 0);
+  int one = 1;
+  assert(setsockopt(_external_fd,SOL_SOCKET,SO_REUSEADDR,
+    &one, sizeof(int)==0));
   _max_fd=_external_fd;
   sockaddr_in addr = { AF_INET, htons(port), {INADDR_ANY} };
   int b = bind(_external_fd, reinterpret_cast<const sockaddr*>(&addr),
@@ -26,6 +29,9 @@ Server::Server(uint16_t port) {
   
   //setup the unix socket
   _local_fd = socket(AF_LOCAL,SOCK_STREAM,0);
+  //assert(setsockopt(_local_fd,SOL_SOCKET,SO_REUSEADDR,
+  //  &one, sizeof(int)==0));
+ 
   sockaddr_un un = { AF_UNIX, "/tmp/psxml" };
   assert(bind(_local_fd, reinterpret_cast<const sockaddr*>(&un), 
     sizeof(sockaddr_un)) == 0);
@@ -54,14 +60,14 @@ void Server::run() {
   }
 }
 void Server::_deal_with_sockets() {
-  list<int> delete_list;
+  set<int> delete_list;
   // check for errors
   for(map<int,PSXMLProtocol*>::iterator it = _protocols.begin();
     it != _protocols.end(); it++) {
     if(FD_ISSET(it->first,&_exception) != 0) {
       // something bad happended!
       // TODO: log
-      delete_list.push_back(it->first);
+      delete_list.insert(it->first);
     }
   }
   // see if there are any awaiting new sockets on the external 
@@ -102,7 +108,7 @@ void Server::_deal_with_sockets() {
       char data[1024*64];
       ssize_t rs = recv(it->first,data,1024*64,MSG_DONTWAIT);
       if(rs <= 0) {
-        delete_list.push_back(it->first);
+        delete_list.insert(it->first);
       } else {
         _route_xml(it->first,it->second->decode(data,rs));
       }
@@ -113,10 +119,10 @@ void Server::_deal_with_sockets() {
     it != _protocols.end(); it++) {
     // if there is work to be done
     if(FD_ISSET(it->first,&_write) != 0 
-      && it->second->pull_encoded_size() > 0) {
-      // we have data to send (of some sort)
-      ssize_t ss = it->second->pull_encoded_size();
+      && it->second->pull_encoded_size() > 0 &&
+      delete_list.count(it->first)==0) {
       ssize_t ss_ret = -1;
+      ssize_t ss = it->second->pull_encoded_size();
       // if there is too much data, throttle back
       bool too_much_data = false;
       
@@ -134,12 +140,12 @@ void Server::_deal_with_sockets() {
         it->second->pull_encoded(ss_ret);
       } else {
         // something bad happend!
-        delete_list.push_back(it->first);
+        delete_list.insert(it->first);
       }
     } // end "if we have data"
   } // end loop
   // clear the delete list
-  for(list<int>::const_iterator it = delete_list.begin();
+  for(set<int>::const_iterator it = delete_list.begin();
     it != delete_list.end(); it++) {
     _remove_fd(*it);
   }
@@ -214,6 +220,8 @@ void Server::_remove_fd(int fd) {
   delete _protocols[fd];
   _protocols.erase(fd);
   _engine.remove(fd);
+  shutdown(fd,SHUT_RDWR);
+  close(fd);
 }
 
 Server::~Server() {

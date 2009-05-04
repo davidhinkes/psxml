@@ -22,6 +22,8 @@ void die(int) {
   delete server;
   exit(0);
 }
+void ok(int) {}
+
 int main() {
   server = new Server(10000);
   // return to the terminal ...
@@ -32,6 +34,9 @@ int main() {
   signal(SIGINT,die);
   signal(SIGTERM,die);
   signal(SIGQUIT,die);
+  // sigpipe is a part of life ...
+  // carry on
+  signal(SIGPIPE,ok);
   server->run();
   return 0;
 }
