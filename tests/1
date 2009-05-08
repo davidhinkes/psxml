@@ -1,9 +1,14 @@
 #/bin/sh
-./psxmld 
-./test-client &
-./test-client 
 
+base=`dirname $0`
+$base/../bin/psxmld
+
+$base/../bin/test-client &
+a=$!
+$base/../bin/test-client &
+b=$!
 # wait a while and let the test conclude
-sleep 20 
+wait $a $b
+
 killall test-client
 killall psxmld
