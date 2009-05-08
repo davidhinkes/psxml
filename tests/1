@@ -1,0 +1,9 @@
+#/bin/sh
+./psxmld 
+./test-client &
+./test-client 
+
+# wait a while and let the test conclude
+sleep 20 
+killall test-client
+killall psxmld
