@@ -13,7 +13,7 @@ using namespace boost;
 using namespace xmlpp;
 using namespace Glib;
 
-Server::Server(uint16_t port) {
+Server::Server(uint16_t port): _port(port) {
   //setup the external socket
   _external_fd = socket(AF_INET, SOCK_STREAM,0);
   assert(_external_fd > 0);
@@ -39,15 +39,21 @@ Server::Server(uint16_t port) {
 
   //setup the discovery socket
   _discovery_fd = socket(AF_INET,SOCK_DGRAM,0);
-  // reuse addr
+  assert(setsockopt(_discovery_fd,SOL_SOCKET,SO_BROADCAST,
+    &one, sizeof(int)==0));
+
+// reuse addr
   b = bind(_discovery_fd, reinterpret_cast<const sockaddr*>(&addr),
     sizeof(sockaddr_in));
   assert(b==0);
-
+  
   // clear the FD lists 
   FD_ZERO(&_read);
   FD_ZERO(&_write);
   FD_ZERO(&_exception);
+
+  // tell the rest of the world that we're alive
+  _ping();
 }
 void Server::run() {
   int ret=0;
@@ -59,6 +65,13 @@ void Server::run() {
     assert(ret >=0);
   }
 }
+
+void Server::_ping() {
+  sockaddr_in addr = { AF_INET, htons(_port), {INADDR_BROADCAST} };
+  sendto(_discovery_fd,"psxml",5,0,
+    reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
+}
+
 void Server::_deal_with_sockets() {
   set<int> delete_list;
   // check for errors
@@ -94,7 +107,31 @@ void Server::_deal_with_sockets() {
     recvfrom(_discovery_fd,packet,5,0,reinterpret_cast<sockaddr*>(&addr),
       &addr_size);
     if(string(packet) =="psxml") {
-      // got a discovery packet
+      // got a discovery packet, see if we already know the existance
+      // of the psxmld server by looking at our foreign connections
+      bool new_foreign = true;
+      for(map<int,uint32_t>::const_iterator it =
+        _foreign_connections.begin(); it != _foreign_connections.end();
+	it++) {
+        if (it->second == addr.sin_addr.s_addr)
+	  new_foreign = false;
+      }
+      if(new_foreign) {
+        // new foreign connection ... this is going to be fun!
+	int fd = socket(AF_INET,SOCK_STREAM,0);
+	// we reuse addr because it's the same for both
+	// UDP and TCP
+	assert(connect(fd, reinterpret_cast<sockaddr*>(&addr),sizeof(addr))
+	  ==0);
+        // make a new protocol
+	_protocols[fd] = new PSXMLProtocol;
+	// keep tabs on this forign connection
+        _foreign_connections[fd] = addr.sin_addr.s_addr;
+	
+	_update_foreign_subscriptions(fd);
+	// we just established a new connection .... ping!
+	_ping();
+      }
     }
   }
  
@@ -209,7 +246,12 @@ void Server::_route_xml(int fd,vector<shared_ptr<Document> > docs) {
         xpath.ns = prefix_map;
 	exps.push_back(xpath);
       }
-      _engine.subscribe(fd,exps);
+      bool foreign = (_foreign_connections.count(fd) > 0); 
+      _engine.subscribe(fd,exps,foreign);
+      // if our aggregate subscriptions have changed (non-foreign)
+      // we tell the other psxmld servers!
+      if(!foreign)
+        _update_foreign_subscriptions();
     }
     // find any data publishes
     _engine.publish( root->find("/psxml:Publish/*",pnm), _protocols);
@@ -220,8 +262,20 @@ void Server::_remove_fd(int fd) {
   delete _protocols[fd];
   _protocols.erase(fd);
   _engine.remove(fd);
+  _foreign_connections.erase(fd);
   shutdown(fd,SHUT_RDWR);
   close(fd);
+}
+
+void Server::_update_foreign_subscriptions(int fd) {
+  _protocols[fd]->subscribe(_engine.aggregate_subscriptions());
+}
+
+void Server::_update_foreign_subscriptions() {
+  for(map<int,uint32_t>::const_iterator it = _foreign_connections.begin();
+    it != _foreign_connections.end(); it++) {
+    _update_foreign_subscriptions(it->first); 
+  }
 }
 
 Server::~Server() {

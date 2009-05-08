@@ -7,5 +7,5 @@ localEnv = env.Clone()
 library_sources = glob.glob('*.cpp')
 
 localEnv.SharedLibrary('#/lib/psxml',library_sources)
-localEnv.Program('test-client',['test-client.cc']+library_sources)
+localEnv.Program('#/bin/test-client',['test-client.cc']+library_sources)
 localEnv.Program('#/bin/psxmld',['psxmld.cc']+library_sources)

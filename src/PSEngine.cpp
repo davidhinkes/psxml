@@ -9,12 +9,18 @@ PSEngine::PSEngine(): _psxml_ns("http://www.psxml.org/PSXML-0.1") {
 }
 
 void PSEngine::publish(const Element * pub_elem,
-  map<int,PSXMLProtocol* > & clients) {
+  map<int,PSXMLProtocol* > & clients, bool foreign) {
   // create a document with just the pub_elem
   Document doc;
   doc.create_root_node_by_import(pub_elem);
   for(map<int,list<XPathExpression> >::const_iterator it = 
     _subscriptions.begin(); it != _subscriptions.end(); it++) {
+    /* 
+     * if the data came from a foreign source, do not forward
+     * it to another foreigner
+     */
+    if (foreign && _full_copy[it->first])
+      continue;
     set<Node*> node_set;
     for(list<XPathExpression>::const_iterator j = it->second.begin();
       j != it->second.end(); j++) {
@@ -36,10 +42,10 @@ void PSEngine::publish(const Element * pub_elem,
 }
 
 void PSEngine::publish(const NodeSet & nodes,
-  map<int,PSXMLProtocol* > & clients) {
+  map<int,PSXMLProtocol* > & clients, bool foreign) {
   // go through the list of elements and publish
   for(unsigned int i = 0; i < nodes.size(); i++) {
-    publish(dynamic_cast<Element*>(nodes[i]),clients);
+    publish(dynamic_cast<Element*>(nodes[i]),clients,foreign);
   }
 }
  
@@ -69,7 +75,7 @@ list<XPathExpression> PSEngine::aggregate_subscriptions() {
   list<XPathExpression> exps;
   for(map<int,list<XPathExpression> >::const_iterator it = 
     _subscriptions.begin(); it != _subscriptions.end(); it++) {
-    // the subscriptions only count if they are local (!_full_copy)
+    // the subscriptions only count if they are not foreign (!_full_copy)
     bool b = _full_copy[it->first];
     if(!b) {
       for(list<XPathExpression>::const_iterator j = it->second.begin();

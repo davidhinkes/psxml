@@ -36,14 +36,21 @@ namespace psxml {
     void _remove_fd(int fd);
     void _route_xml(int fd,
       std::vector<boost::shared_ptr<xmlpp::Document> > docs);
+    void _ping();
+    void _update_foreign_subscriptions();
+    void _update_foreign_subscriptions(int fd);
     fd_set _read,_write,_exception;
-    // fs -> protocol
+    // fd -> protocol
     std::map<int,PSXMLProtocol*> _protocols;
+    // fd -> addr (this only works for ipv4 IP
+    // addresses)
+    std::map<int,uint32_t> _foreign_connections;
     // fd of main server socket
     int _external_fd;
     int _local_fd;
     int _discovery_fd;
     int _max_fd;
+    uint16_t _port;
     PSEngine _engine;
   };
 }

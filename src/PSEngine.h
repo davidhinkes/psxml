@@ -18,9 +18,9 @@ namespace psxml {
   public:
     PSEngine();
     void publish(const xmlpp::Element * elem,
-      std::map<int,PSXMLProtocol* > & clients);
+      std::map<int,PSXMLProtocol* > & clients,bool foreign = false);
     void publish(const xmlpp::NodeSet & nodes,
-      std::map<int,PSXMLProtocol* > & clients);
+      std::map<int,PSXMLProtocol* > & clients, bool foreign = false);
     void subscribe(int fd, std::list<XPathExpression> exps,
       bool full_copy = false);
     void remove(int fd);
