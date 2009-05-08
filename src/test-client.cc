@@ -35,14 +35,12 @@ int main() {
     list<Element *> elems = con.run(1*1000000);
     if(elems.size() == 0) {
       // didn't get anything ... bad
-      cerr<<"test-client didn't get exptected publish data"<<endl;
       for(unsigned int m = 0; m < 64; m++)
         con.publish(l);
 
     }
     for(list<Element*>::const_iterator it = elems.begin();
       it != elems.end(); it++) {
-      cout<<(*it)->get_name()<<endl;
     }
    }
   return 0;

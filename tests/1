@@ -10,5 +10,4 @@ b=$!
 # wait a while and let the test conclude
 wait $a $b
 
-killall test-client
 killall psxmld
