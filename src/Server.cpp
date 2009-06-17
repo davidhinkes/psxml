@@ -2,10 +2,11 @@
 #include <libxml++/libxml++.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <cassert>
 #include <netinet/in.h>
 #include <sys/un.h>
+#include <ifaddrs.h>
 #include <cerrno>
+#include <cassert>
 
 using namespace std;
 using namespace psxml;
@@ -67,9 +68,22 @@ void Server::run() {
 }
 
 void Server::_ping() {
-  sockaddr_in addr = { AF_INET, htons(_port), {INADDR_BROADCAST} };
-  sendto(_discovery_fd,"psxml",5,0,
-    reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
+  struct ifaddrs * addrs;
+  getifaddrs( & addrs );
+  struct ifaddrs * ifap = addrs;
+  while(ifap != NULL) {
+    if( ifap->ifa_netmask != NULL ) {
+      unsigned int s_addr = ((sockaddr_in*)ifap->ifa_addr)->sin_addr.s_addr;
+      s_addr |= ~(((sockaddr_in*)ifap->ifa_netmask)->sin_addr.s_addr);
+      sockaddr_in addr = { AF_INET, htons(_port), {s_addr} };
+      sendto(_discovery_fd,"psxml",5,MSG_DONTWAIT,
+        reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
+      // if we can't send (for whatever reason) on this interface, that's ok. 
+      //assert(sent == 5);
+    }
+    ifap = ifap->ifa_next;
+  }
+  freeifaddrs ( addrs);
 }
 
 void Server::_deal_with_sockets() {
