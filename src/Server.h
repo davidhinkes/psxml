@@ -14,6 +14,9 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 namespace psxml {
   class Server {
   public:
@@ -52,6 +55,7 @@ namespace psxml {
     int _max_fd;
     uint16_t _port;
     PSEngine _engine;
+    in_addr_t _multicast_addr;
   };
 }
 

@@ -40,14 +40,27 @@ Server::Server(uint16_t port): _port(port) {
 
   //setup the discovery socket
   _discovery_fd = socket(AF_INET,SOCK_DGRAM,0);
-  assert(setsockopt(_discovery_fd,SOL_SOCKET,SO_BROADCAST,
+  assert(setsockopt(_discovery_fd,SOL_SOCKET,SO_REUSEADDR,
     &one, sizeof(int)==0));
+ 
 
-// reuse addr
+  // reuse addr
   b = bind(_discovery_fd, reinterpret_cast<const sockaddr*>(&addr),
     sizeof(sockaddr_in));
   assert(b==0);
   
+  _multicast_addr = inet_addr("226.0.0.1"); 
+  struct ip_mreq imreq;
+  memcpy(&imreq.imr_multiaddr,&addr,sizeof(addr));
+  memcpy(&imreq.imr_interface,&addr,sizeof(addr));
+  imreq.imr_multiaddr.s_addr = _multicast_addr;
+  unsigned char zero = 0;
+  setsockopt(_discovery_fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,
+    &imreq,sizeof(imreq));
+  setsockopt(_discovery_fd,IPPROTO_IP,IP_MULTICAST_LOOP,
+    &zero,sizeof(zero));
+
+
   // clear the FD lists 
   FD_ZERO(&_read);
   FD_ZERO(&_write);
@@ -66,24 +79,11 @@ void Server::run() {
     assert(ret >=0);
   }
 }
-
 void Server::_ping() {
-  struct ifaddrs * addrs;
-  getifaddrs( & addrs );
-  struct ifaddrs * ifap = addrs;
-  while(ifap != NULL) {
-    if( ifap->ifa_netmask != NULL ) {
-      unsigned int s_addr = ((sockaddr_in*)ifap->ifa_addr)->sin_addr.s_addr;
-      s_addr |= ~(((sockaddr_in*)ifap->ifa_netmask)->sin_addr.s_addr);
-      sockaddr_in addr = { AF_INET, htons(_port), {s_addr} };
-      sendto(_discovery_fd,"psxml",5,MSG_DONTWAIT,
-        reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
-      // if we can't send (for whatever reason) on this interface, that's ok. 
-      //assert(sent == 5);
-    }
-    ifap = ifap->ifa_next;
-  }
-  freeifaddrs ( addrs);
+  sockaddr_in addr = { AF_INET, htons(_port), {_multicast_addr} };
+  ssize_t sent = sendto(_discovery_fd,"psxml",5,0,
+    reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
+  assert(sent==5);
 }
 
 void Server::_deal_with_sockets() {
