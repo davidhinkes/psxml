@@ -51,9 +51,8 @@ Server::Server(uint16_t port): _port(port) {
   
   _multicast_addr = inet_addr("226.0.0.1"); 
   struct ip_mreq imreq;
-  memcpy(&imreq.imr_multiaddr,&addr,sizeof(addr));
-  memcpy(&imreq.imr_interface,&addr,sizeof(addr));
   imreq.imr_multiaddr.s_addr = _multicast_addr;
+  imreq.imr_interface.s_addr = htonl(INADDR_ANY);
   unsigned char zero = 0;
   setsockopt(_discovery_fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,
     &imreq,sizeof(imreq));
