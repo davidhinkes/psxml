@@ -54,6 +54,7 @@ namespace psxml {
     int _discovery_fd;
     int _max_fd;
     uint16_t _port;
+    std::string _path;
     PSEngine _engine;
     in_addr_t _multicast_addr;
   };

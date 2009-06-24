@@ -7,6 +7,7 @@
 #include <ifaddrs.h>
 #include <cerrno>
 #include <cassert>
+#include <cstdlib>
 
 using namespace std;
 using namespace psxml;
@@ -32,8 +33,9 @@ Server::Server(uint16_t port): _port(port) {
   _local_fd = socket(AF_LOCAL,SOCK_STREAM,0);
   //assert(setsockopt(_local_fd,SOL_SOCKET,SO_REUSEADDR,
   //  &one, sizeof(int)==0));
- 
-  sockaddr_un un = { AF_UNIX, "/tmp/psxml" };
+  _path="/tmp/psxml-"+string(getenv("USER")); 
+  sockaddr_un un = { AF_UNIX, "" };
+  memcpy(un.sun_path,_path.c_str(),_path.size());
   assert(bind(_local_fd, reinterpret_cast<const sockaddr*>(&un), 
     sizeof(sockaddr_un)) == 0);
   assert(listen(_local_fd,1024)==0);
@@ -300,5 +302,5 @@ Server::~Server() {
   close(_local_fd);
   close(_discovery_fd);
 
-  remove("/tmp/psxml");
+  remove(_path.c_str());
 }

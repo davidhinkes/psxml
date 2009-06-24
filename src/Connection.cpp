@@ -13,6 +13,7 @@
 
 #include <sys/select.h>
 #include <sys/un.h>
+#include <cstdlib>
 
 using namespace psxml;
 using namespace xmlpp;
@@ -21,7 +22,9 @@ using namespace boost;
 Connection::Connection() {
   _pnm["psxml"]="http://www.psxml.org/PSXML-0.1";
   _fd = socket(AF_LOCAL, SOCK_STREAM, 0);
-  sockaddr_un addr = {AF_UNIX,"/tmp/psxml"};
+  string path="/tmp/psxml-"+string(getenv("USER")); 
+  sockaddr_un addr = {AF_UNIX,""};
+  memcpy(addr.sun_path,path.c_str(),path.size());
   assert(connect(_fd,reinterpret_cast<sockaddr*>(&addr),
     sizeof(sockaddr_un)) == 0);
 }
