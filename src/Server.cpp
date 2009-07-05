@@ -82,9 +82,8 @@ void Server::run() {
 }
 void Server::_ping() {
   sockaddr_in addr = { AF_INET, htons(_port), {_multicast_addr} };
-  ssize_t sent = sendto(_discovery_fd,"psxml",5,0,
+  sendto(_discovery_fd,"psxml",5,0,
     reinterpret_cast<const sockaddr*>(&addr),sizeof(addr));
-  assert(sent==5);
 }
 
 void Server::_deal_with_sockets() {

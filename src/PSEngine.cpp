@@ -50,9 +50,9 @@ void PSEngine::publish(const NodeSet & nodes,
 }
  
 void PSEngine::subscribe(int fd, list<XPathExpression> exps,
-  bool full_copy) {
+  bool foreign) {
   _subscriptions[fd]=exps;
-  _full_copy[fd] = full_copy;
+  _full_copy[fd] = foreign;
 }
 
 void PSEngine::remove(int fd) {
